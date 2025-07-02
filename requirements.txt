@@ -28,12 +28,10 @@ packaging==24.1
 pefile==2023.2.7
 Pillow==9.5.0
 proglog==0.1.10
-py2exe==0.13.0.2
 PyAudio==0.2.13
 PyAutoGUI==0.9.54
 pycryptodomex==3.20.0
 PyGetWindow==0.0.9
-pyinstaller==6.11.0
 pyinstaller-hooks-contrib==2024.9
 PyMsgBox==1.0.9
 pyperclip==1.8.2
