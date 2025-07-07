@@ -3,7 +3,7 @@ import base64
 import os
 
 app = Flask(__name__)
-datos_temporales = {}
+datos_temporales = []
 
 @app.route("/guardar_datos", methods=["POST"])
 def guardar_datos():
