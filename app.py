@@ -28,7 +28,7 @@ def guardar_datos():
         "matricula": matricula,
         "token": token
     })
-    return {"message": "Datos guardados correctamente", "token": token}, 200
+    return {"token": token}, 200
 
 @app.route("/obtener_datos", methods=["GET"])
 def obtener_datos():
