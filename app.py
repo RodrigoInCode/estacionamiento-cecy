@@ -24,15 +24,15 @@ app = Flask(__name__)
 
 
 @app.route("/registrar_usuario", methods=["POST"])
-def guardar_datos():
+def registrar_usuario():
     # Obetern datos del formulario
     data = request.get_json()
-    nombre = data.get("nombre")
-    apellido_materno = data.get("apellido_materno")
-    apellido_paterno = data.get("apellido_paterno")
-    color_auto = data.get("color_auto")
-    modelo_auto = data.get("modelo_auto")
-    matricula = data.get("matricula")
+    nombre = request.form("nombre")
+    apellido_materno = request.form("apellido_materno")
+    apellido_paterno = request.form("apellido_paterno")
+    color_auto = request.form("color_auto")
+    modelo_auto = request.form("modelo_auto")
+    matricula = request.form("matricula")
     token = base64.b64encode(f"u={nombre}:{matricula}".encode()).decode().rstrip("=")
     if not all([nombre, apellido_materno, apellido_paterno, color_auto, modelo_auto, matricula, token]):
         return {"error": "Faltan datos"}, 400
@@ -53,7 +53,11 @@ def guardar_datos():
         return {"error": f"Error al guardar en la base de datos: {e}"}, 500
 
     
-    return {"token": token}, 200
+    # return {"token": token}, 200
+
+@app.route("/registrar", methods=["POST"])
+def registrar_nuevo_usuario():
+    return render_template("registrar_nuevo_usuario.html")
 
 @app.route("/obtener_qr", methods=["POST"])
 def obtener_qr():
@@ -64,14 +68,14 @@ def obtener_qr():
     
     cursor.execute("SELECT token FROM usuarios WHERE matricula = %s", (matricula,))
     row = cursor.fetchone()
-    
+    token = row[0] if row else None
     if not row:
         return {"error": "Matrícula no encontrada"}, 404
     
     
     
     return {
-        "token": row[0],
+        "token": token,
     }, 200
 
 
