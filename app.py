@@ -23,7 +23,7 @@ cursor = conn.cursor()
 app = Flask(__name__)
 
 
-@app.route("/guardar_datos", methods=["POST"])
+@app.route("/registrar_usuario", methods=["POST"])
 def guardar_datos():
     # Obetern datos del formulario
     data = request.get_json()
@@ -55,6 +55,24 @@ def guardar_datos():
     
     return {"token": token}, 200
 
+@app.route("/obtener_qr", methods=["POST"])
+def obtener_qr():
+    data = request.get_json()
+    matricula = data.get("matricula")
+    if not matricula:
+        return {"error": "Matricula requerida"}, 400
+    
+    cursor.execute("SELECT token FROM usuarios WHERE matricula = %s", (matricula,))
+    row = cursor.fetchone()
+    
+    if not row:
+        return {"error": "Matrícula no encontrada"}, 404
+    
+    
+    
+    return {
+        "token": row[0],
+    }, 200
 
 
 @app.route("/actualizar_datos", methods=["POST"])
@@ -67,7 +85,7 @@ def actualizar_datos():
 
     row = cursor.fetchone()
     if row:
-        # Devuelve todos los datos encontrados
+        
         return {
             "nombre": row[1],
             "apellido_materno": row[2],
@@ -111,7 +129,29 @@ def eliminar_datos():
     return {"mensaje": "Datos eliminados correctamente"}, 200
 
     
-
+@app.route("/obtener_datos", methods=["POST"])
+def obtener_datos():
+    data = request.get_json()
+    matricula = data.get("matricula")
+    cursor.execute("SELECT * FROM usuarios WHERE matricula = ? ", (matricula,))
+    rows = cursor.fetchall()
+    
+    if not rows:
+        return {"mensaje": "No hay datos registrados"}, 404
+    
+    usuario = []
+    for row in rows:
+        usuario.append({
+            "nombre": row[1],
+            "apellido_materno": row[2],
+            "apellido_paterno": row[3],
+            "color_auto": row[4],
+            "modelo_auto": row[5],
+            "matricula": row[6],
+            "token": row[7]
+        })
+    
+    return {"data_usuario": usuario}, 200
 
 
 
