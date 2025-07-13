@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}Registrar Nuevo Usuario{% endblock %}
+
+{% block content %}
+    <h1>Registrar Nuevo Usuario</h1>
+    <form id="registrarUsuarioForm" action="/registrar_usuario" method="POST">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+
+        <label for="apellido_paterno">Apellido Paterno:</label>
+        <input type="text" id="apellido_paterno" name="apellido_paterno" required>
+
+        <label for="apellido_materno">Apellido Materno:</label>
+        <input type="text" id="apellido_materno" name="apellido_materno" required>
+
+        <label for="color_auto">Color del Auto:</label>
+        <input type="text" id="color_auto" name="color_auto" required>
+
+        <label for="modelo_auto">Modelo del Auto:</label>
+        <text type="text" id="modelo_auto" name="modelo_auto" required></text>
+
+        <label for="matricula">Matrícula:</label>
+        <input type="text" id="matricula" name="matricula" required>
+
+        <button type="submit">Registrar Usuario</button>
+    </form>
+    <div id="responseMessage" class="message"></div>
+    <p><a href="/">Volver al Inicio</a></p>
+
+    <script>
+        document.getElementById('registrarUsuarioForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            const responseMessage = document.getElementById('responseMessage');
+
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    responseMessage.textContent = 'Usuario registrado exitosamente. Token: ' + (result.token || 'N/A');
+                    responseMessage.className = 'message success';
+                    form.reset();
+                } else {
+                    responseMessage.textContent = 'Error: ' + (result.error || 'Algo salió mal.');
+                    responseMessage.className = 'message error';
+                }
+            } catch (error) {
+                responseMessage.textContent = 'Error de conexión: ' + error.message;
+                responseMessage.className = 'message error';
+            }
+        });
+    </script>
+{% endblock %}

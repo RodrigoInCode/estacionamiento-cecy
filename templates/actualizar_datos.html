@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{% block title %}Actualizar Datos de Usuario{% endblock %}
+
+{% block content %}
+    <h1>Actualizar Datos de Usuario</h1>
+    <form id="cargarDatosForm">
+        <label for="matricula_actualizar_cargar">Matrícula a Cargar:</label>
+        <input type="text" id="matricula_actualizar_cargar" name="matricula" required>
+        <button type="submit">Cargar Datos para Actualizar</button>
+    </form>
+
+    <form id="actualizarDatosForm" style="display: none;">
+        <h2>Datos del Usuario</h2>
+        <input type="hidden" id="matricula_hidden" name="matricula">
+
+        <label for="nombre_actualizar">Nombre:</label>
+        <input type="text" id="nombre_actualizar" name="nombre">
+
+        <label for="apellido_paterno_actualizar">Apellido Paterno:</label>
+        <input type="text" id="apellido_paterno_actualizar" name="apellido_paterno">
+
+        <label for="apellido_materno_actualizar">Apellido Materno:</label>
+        <input type="text" id="apellido_materno_actualizar" name="apellido_materno">
+
+        <label for="color_auto_actualizar">Color del Auto:</label>
+        <input type="text" id="color_auto_actualizar" name="color_auto">
+
+        <label for="modelo_auto_actualizar">Modelo del Auto:</label>
+        <input type="text" id="modelo_auto_actualizar" name="modelo_auto">
+        
+        <button type="submit">Actualizar Datos</button>
+    </form>
+    <div id="responseMessage" class="message"></div>
+    <p><a href="/">Volver al Inicio</a></p>
+
+    <script>
+        document.getElementById('cargarDatosForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const matricula = document.getElementById('matricula_actualizar_cargar').value;
+            const responseMessage = document.getElementById('responseMessage');
+            const actualizarDatosForm = document.getElementById('actualizarDatosForm');
+            responseMessage.textContent = '';
+            actualizarDatosForm.style.display = 'none';
+
+            try {
+                const response = await fetch('/actualizar_datos', { // Using GET to fetch existing data
+                    method: 'POST', // Your backend uses POST for getting data in actualizar_datos route
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ matricula: matricula })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('matricula_hidden').value = matricula;
+                    document.getElementById('nombre_actualizar').value = result.nombre;
+                    document.getElementById('apellido_paterno_actualizar').value = result.apellido_paterno;
+                    document.getElementById('apellido_materno_actualizar').value = result.apellido_materno;
+                    document.getElementById('color_auto_actualizar').value = result.color_auto;
+                    document.getElementById('modelo_auto_actualizar').value = result.modelo_auto;
+                    actualizarDatosForm.style.display = 'block';
+                    responseMessage.className = 'message info';
+                    responseMessage.textContent = 'Datos cargados. Realice los cambios y actualice.';
+                } else {
+                    responseMessage.textContent = 'Error: ' + (result.error || 'Matrícula no encontrada o error al cargar datos.');
+                    responseMessage.className = 'message error';
+                }
+            } catch (error) {
+                responseMessage.textContent = 'Error de conexión: ' + error.message;
+                responseMessage.className = 'message error';
+            }
+        });
+
+        document.getElementById('actualizarDatosForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            const responseMessage = document.getElementById('responseMessage');
+
+            try {
+                const response = await fetch('/actualizar_datos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    responseMessage.textContent = result.mensaje || 'Datos actualizados correctamente.';
+                    responseMessage.className = 'message success';
+                    document.getElementById('actualizarDatosForm').style.display = 'none'; // Hide form after update
+                } else {
+                    responseMessage.textContent = 'Error: ' + (result.error || 'Algo salió mal al actualizar.');
+                    responseMessage.className = 'message error';
+                }
+            } catch (error) {
+                responseMessage.textContent = 'Error de conexión: ' + error.message;
+                responseMessage.className = 'message error';
+            }
+        });
+    </script>
+{% endblock %}
