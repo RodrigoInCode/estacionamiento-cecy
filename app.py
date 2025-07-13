@@ -26,7 +26,7 @@ app = Flask(__name__)
 @app.route("/registrar_usuario", methods=["POST"])
 def registrar_usuario():
     # Obetern datos del formulario
-    data = request.get_json()
+    
     nombre = request.form("nombre")
     apellido_materno = request.form("apellido_materno")
     apellido_paterno = request.form("apellido_paterno")
