@@ -10,7 +10,7 @@ try:
     host="dpg-d1i51rmmcj7s73d2i690-a.oregon-postgres.render.com",
     dbname="estacionamiento_db",
     user="estacionamiento_db_user",
-    password="tu_contraseña",
+    password="kJq0EaoHYH8lk9EJ7TA2SLnT0xdPuJzw",
     port="5432"
 )
 except Exception as e:
