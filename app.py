@@ -27,12 +27,12 @@ app = Flask(__name__)
 def registrar_usuario():
     # Obetern datos del formulario
     
-    nombre = request.form("nombre")
-    apellido_materno = request.form("apellido_materno")
-    apellido_paterno = request.form("apellido_paterno")
-    color_auto = request.form("color_auto")
-    modelo_auto = request.form("modelo_auto")
-    matricula = request.form("matricula")
+    nombre = request.form["nombre"]
+    apellido_materno = request.form["apellido_materno"]
+    apellido_paterno = request.form["apellido_paterno"]
+    color_auto = request.form["color_auto"]
+    modelo_auto = request.form["modelo_auto"]
+    matricula = request.form["matricula"]
     token = base64.b64encode(f"u={nombre}:{matricula}".encode()).decode().rstrip("=")
     if not all([nombre, apellido_materno, apellido_paterno, color_auto, modelo_auto, matricula, token]):
         return {"error": "Faltan datos"}, 400
