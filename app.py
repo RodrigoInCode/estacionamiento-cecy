@@ -55,7 +55,7 @@ def registrar_usuario():
     
     # return {"token": token}, 200
 
-@app.route("/registrar", methods=["POST"])
+@app.route("/registrar")
 def registrar_nuevo_usuario():
     return render_template("registrar_nuevo_usuario.html")
 
