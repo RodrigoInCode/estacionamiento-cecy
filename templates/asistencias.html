@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Exportar Asistencias</h2>
+    <form method="POST" action="/exportar_asistencias">
+        <div class="mb-3">
+            <label for="fecha_inicio" class="form-label">Fecha inicio</label>
+            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+        </div>
+        <div class="mb-3">
+            <label for="fecha_fin" class="form-label">Fecha fin</label>
+            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+        </div>
+        <div class="mb-3">
+            <label for="formato" class="form-label">Formato de exportación</label>
+            <select class="form-select" id="formato" name="formato" required>
+                <option value="csv">CSV</option>
+                <option value="xlsx">Excel</option>
+                <option value="pdf">PDF</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Exportar</button>
+    </form>
+</div>
+{% endblock %}

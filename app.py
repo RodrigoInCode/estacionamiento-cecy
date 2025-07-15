@@ -2,6 +2,9 @@ from flask import Flask, request, render_template, jsonify
 import base64
 import os
 import psycopg2
+import pandas as pd
+from io import BytesIO
+from flask import send_file
 
 # Conexión a la base de datos PostgreSQL (Render te da estos datos)
 
@@ -43,9 +46,9 @@ def show_actualizar_form():
 def show_eliminar_form():
     return render_template("eliminar_datos.html")
 
-@app.route("/qr")
+@app.route("/asistencia")
 def show_qr_form():
-    return render_template("obtener_qr.html")
+    return render_template("asistencias.html")
 
 
 @app.route("/registrar_usuario", methods=["POST"])
@@ -200,6 +203,53 @@ def obtener_datos():
     except Exception as e:
         return jsonify({"error": f"Error al obtener datos de la base de datos: {e}"}), 500
 
+@app.route("/exportar_asistencias", methods=["POST"])
+def exportar_asistencias():
+
+    data = request.get_json()
+    buscar = data.get("buscar")  
+    fecha_inicio = data.get("fecha_inicio")  
+    fecha_fin = data.get("fecha_fin")        
+
+    query = "SELECT * FROM asistencias"
+    params = []
+
+    filtros = []
+    if buscar:
+        filtros.append("(matricula ILIKE %s OR nombre ILIKE %s)")
+        params.extend([f"%{buscar}%", f"%{buscar}%"])
+    if fecha_inicio and fecha_fin:
+        filtros.append("fecha BETWEEN %s AND %s")
+        params.extend([fecha_inicio, fecha_fin])
+    elif fecha_inicio:
+        filtros.append("fecha >= %s")
+        params.append(fecha_inicio)
+    elif fecha_fin:
+        filtros.append("fecha <= %s")
+        params.append(fecha_fin)
+
+    if filtros:
+        query += " WHERE " + " AND ".join(filtros)
+
+        try:
+                cursor.execute(query, tuple(params))
+                rows = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]
+                df = pd.DataFrame(rows, columns=columns)
+
+                output = BytesIO()
+                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                    df.to_excel(writer, index=False, sheet_name='Asistencias')
+                output.seek(0)
+
+                return send_file(
+                    output,
+                    download_name="asistencias.xlsx",
+                    as_attachment=True,
+                    mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+        except Exception as e:
+                return jsonify({"error": f"Error al exportar asistencias: {e}"}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
