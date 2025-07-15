@@ -1,4 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<a href="{{ url_for('exportar_asistencias') }}" class="btn btn-primary">Descargar asistencias</a>
+<form action="{{ url_for('exportar_asistencias') }}" method="post" style="display:inline;">
+	<button type="submit" class="btn btn-primary">Descargar asistencias</button>
+</form>
 {% endblock %}
