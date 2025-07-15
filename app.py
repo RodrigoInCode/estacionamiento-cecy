@@ -205,51 +205,25 @@ def obtener_datos():
 
 @app.route("/exportar_asistencias", methods=["POST"])
 def exportar_asistencias():
+    try:
+        cursor.execute("SELECT * FROM asistencias")
+        rows = cursor.fetchall()
+        if not rows:
+            return jsonify({"error": "No hay asistencias registradas"}), 404
 
-    data = request.get_json()
-    buscar = data.get("buscar")  
-    fecha_inicio = data.get("fecha_inicio")  
-    fecha_fin = data.get("fecha_fin")        
-
-    query = "SELECT * FROM asistencias"
-    params = []
-
-    filtros = []
-    if buscar:
-        filtros.append("(matricula ILIKE %s OR nombre ILIKE %s)")
-        params.extend([f"%{buscar}%", f"%{buscar}%"])
-    if fecha_inicio and fecha_fin:
-        filtros.append("fecha BETWEEN %s AND %s")
-        params.extend([fecha_inicio, fecha_fin])
-    elif fecha_inicio:
-        filtros.append("fecha >= %s")
-        params.append(fecha_inicio)
-    elif fecha_fin:
-        filtros.append("fecha <= %s")
-        params.append(fecha_fin)
-
-    if filtros:
-        query += " WHERE " + " AND ".join(filtros)
-
-        try:
-                cursor.execute(query, tuple(params))
-                rows = cursor.fetchall()
-                columns = [desc[0] for desc in cursor.description]
-                df = pd.DataFrame(rows, columns=columns)
-
-                output = BytesIO()
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    df.to_excel(writer, index=False, sheet_name='Asistencias')
-                output.seek(0)
-
-                return send_file(
-                    output,
-                    download_name="asistencias.xlsx",
-                    as_attachment=True,
-                    mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
-        except Exception as e:
-                return jsonify({"error": f"Error al exportar asistencias: {e}"}), 500
+        columns = [desc[0] for desc in cursor.description]
+        df = pd.DataFrame(rows, columns=columns)
+        output = BytesIO()
+        df.to_excel(output, index=False)
+        output.seek(0)
+        return send_file(
+            output,
+            download_name="asistencias.xlsx",
+            as_attachment=True,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    except Exception as e:
+        return jsonify({"error": f"Error al exportar asistencias: {e}"}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
