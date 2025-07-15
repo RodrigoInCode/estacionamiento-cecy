@@ -12,11 +12,13 @@
             <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
         </div>
         <div class="mb-3">
+            <label for="buscar" class="form-label">Buscar (Matrícula o Nombre)</label>
+            <input type="text" class="form-control" id="buscar" name="buscar" placeholder="Buscar...">
+        </div>
+        <div class="mb-3">
             <label for="formato" class="form-label">Formato de exportación</label>
             <select class="form-select" id="formato" name="formato" required>
-                <option value="csv">CSV</option>
-                <option value="xlsx">Excel</option>
-                <option value="pdf">PDF</option>
+            <option value="xlsx">Excel</option>
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Exportar</button>
